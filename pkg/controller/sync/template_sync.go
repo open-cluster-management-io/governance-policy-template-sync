@@ -153,15 +153,15 @@ func (r *ReconcilePolicy) Reconcile(request reconcile.Request) (reconcile.Result
 		}
 
 		//reject if not configuration policy and has templates
-		if(gvk.Kind != "ConfigurationPolicy"){
+		if gvk.Kind != "ConfigurationPolicy" {
 			//if not configuration policies ,do a simple check for templates {{hub and reject
 			//only checking for hub and not {{ as they could be valid cases where they are valid chars.
-			if strings.Contains(string(policyT.ObjectDefinition.Raw), "{{hub "){
+			if strings.Contains(string(policyT.ObjectDefinition.Raw), "{{hub ") {
 				templatesErrMsg := fmt.Sprintf("Templates are not supported for kind : %s", gvk.Kind)
 				reqLogger.Error(errors.NewBadRequest(templatesErrMsg), "Failed to process policy template")
 				r.recorder.Event(instance, "Warning", "PolicyTemplateSync", templatesErrMsg)
 				r.recorder.Event(instance, "Warning",
-					fmt.Sprintf(policyFmtStr, instance.GetNamespace(), object.(metav1.Object).GetName()), "NonCompliant; "+ templatesErrMsg)
+					fmt.Sprintf(policyFmtStr, instance.GetNamespace(), object.(metav1.Object).GetName()), "NonCompliant; "+templatesErrMsg)
 
 				//continue to the next policy template
 				continue
