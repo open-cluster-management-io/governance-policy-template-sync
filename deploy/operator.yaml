@@ -124,9 +124,7 @@ spec:
         name: governance-policy-template-sync
     spec:
       containers:
-      - args:
-        - --leader-elect
-        command:
+      - command:
         - governance-policy-template-sync
         env:
         - name: WATCH_NAMESPACE

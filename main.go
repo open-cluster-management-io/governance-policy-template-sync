@@ -47,7 +47,7 @@ func main() {
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 
 	var enableLeaderElection bool
-	pflag.BoolVar(&enableLeaderElection, "leader-elect", false,
+	pflag.BoolVar(&enableLeaderElection, "leader-elect", true,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 
