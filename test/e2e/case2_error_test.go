@@ -40,19 +40,6 @@ var _ = Describe("Test error handling", func() {
 		Expect(err).Should(BeNil())
 		utils.ListWithTimeout(clientManagedDynamic, gvrPolicy, metav1.ListOptions{}, 0, true, defaultTimeoutSeconds)
 	})
-	It("should not break if no spec", func() {
-		By("Creating ../resources/case2_error_test/no-spec.yaml on managed cluster in ns:" + testNamespace)
-		_, err := utils.KubectlWithOutput("apply", "-f", "../resources/case2_error_test/no-spec.yaml",
-			"-n", testNamespace)
-		Expect(err).Should(BeNil())
-		By("Checking if policy was created on managed cluster in ns:" + testNamespace)
-		utils.GetWithTimeout(clientManagedDynamic, gvrPolicy, "default.case2-no-spec", testNamespace, true, defaultTimeoutSeconds)
-		By("Deleting ../resources/case2_error_test/no-spec.yam to clean up")
-		_, err = utils.KubectlWithOutput("delete", "-f", "../resources/case2_error_test/no-spec.yaml",
-			"-n", testNamespace)
-		Expect(err).Should(BeNil())
-		utils.ListWithTimeout(clientManagedDynamic, gvrPolicy, metav1.ListOptions{}, 0, true, defaultTimeoutSeconds)
-	})
 	It("should generate decode err event", func() {
 		By("Creating ../resources/case2_error_test/template-decode-error.yaml on managed cluster in ns:" + testNamespace)
 		_, err := utils.KubectlWithOutput("apply", "-f", "../resources/case2_error_test/template-decode-error.yaml",
