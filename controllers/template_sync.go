@@ -79,6 +79,7 @@ func (r *PolicyReconciler) Reconcile(ctx context.Context, request reconcile.Requ
 			return reconcile.Result{}, nil
 		}
 		// Error reading the object - requeue the request.
+		reqLogger.Error(err, "Failed to get the policy, will requeue the request")
 		return reconcile.Result{}, err
 	}
 
@@ -218,7 +219,15 @@ func (r *PolicyReconciler) Reconcile(ctx context.Context, request reconcile.Requ
 				// of the other policy templates
 				return reconcile.Result{Requeue: true}, nil
 			}
+
 			// other error
+			reqLogger.Error(
+				err,
+				"Failed to get the object in the policy template",
+				"name", tName,
+				"namespace", instance.GetNamespace(),
+				"kind", gvk.Kind,
+			)
 			r.Recorder.Event(instance, "Warning", "PolicyTemplateSync",
 				fmt.Sprintf("Failed to create policy template %s", tName))
 			return reconcile.Result{}, err
@@ -262,6 +271,8 @@ func (r *PolicyReconciler) Reconcile(ctx context.Context, request reconcile.Requ
 			reqLogger.Info("Existing object has been updated", "PolicyTemplateName", tName)
 			r.Recorder.Event(instance, "Normal", "PolicyTemplateSync",
 				fmt.Sprintf("Policy template %s was updated successfully", tName))
+		} else {
+			reqLogger.Info("Existing object matches the policy template", "PolicyTemplateName", tName)
 		}
 	}
 	reqLogger.Info("Completed the reconciliation")
