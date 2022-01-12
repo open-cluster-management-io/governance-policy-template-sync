@@ -8,8 +8,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	policiesv1 "github.com/open-cluster-management/governance-policy-propagator/pkg/apis/policy/v1"
-	"github.com/open-cluster-management/governance-policy-propagator/pkg/controller/common"
+	policiesv1 "github.com/stolostron/governance-policy-propagator/pkg/apis/policy/v1"
+	"github.com/stolostron/governance-policy-propagator/pkg/controller/common"
 	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
