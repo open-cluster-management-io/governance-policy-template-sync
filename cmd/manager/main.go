@@ -13,9 +13,9 @@ import (
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	"github.com/open-cluster-management/governance-policy-template-sync/pkg/apis"
-	"github.com/open-cluster-management/governance-policy-template-sync/pkg/controller"
-	"github.com/open-cluster-management/governance-policy-template-sync/version"
+	"github.com/stolostron/governance-policy-template-sync/pkg/apis"
+	"github.com/stolostron/governance-policy-template-sync/pkg/controller"
+	"github.com/stolostron/governance-policy-template-sync/version"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	"github.com/operator-framework/operator-sdk/pkg/leader"

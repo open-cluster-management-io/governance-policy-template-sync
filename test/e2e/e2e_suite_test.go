@@ -11,7 +11,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/open-cluster-management/governance-policy-propagator/test/utils"
+	"github.com/stolostron/governance-policy-propagator/test/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -55,7 +55,7 @@ var _ = BeforeSuite(func() {
 	gvrEvent = schema.GroupVersionResource{Group: "", Version: "v1", Resource: "events"}
 	clientManaged = NewKubeClient("", "", "")
 	clientManagedDynamic = NewKubeClientDynamic("", "", "")
-	defaultImageRegistry = "quay.io/open-cluster-management"
+	defaultImageRegistry = "quay.io/stolostron"
 	defaultImagePullSecretName = "multiclusterhub-operator-pull-secret"
 	testNamespace = "managed"
 	defaultTimeoutSeconds = 30
