@@ -34,7 +34,7 @@ GOBIN_DEFAULT := $(GOPATH)/bin
 export GOBIN ?= $(GOBIN_DEFAULT)
 GOARCH = $(shell go env GOARCH)
 GOOS = $(shell go env GOOS)
-TESTARGS_DEFAULT := "-v"
+TESTARGS_DEFAULT := -v
 export TESTARGS ?= $(TESTARGS_DEFAULT)
 DEST ?= $(GOPATH)/src/$(GIT_HOST)/$(BASE_DIR)
 VERSION ?= $(shell cat COMPONENT_VERSION 2> /dev/null)
@@ -43,6 +43,8 @@ IMAGE_NAME_AND_VERSION ?= $(REGISTRY)/$(IMG)
 KIND_NAME ?= test-managed
 KIND_NAMESPACE ?= open-cluster-management-agent-addon
 KIND_VERSION ?= latest
+MANAGED_CLUSTER_NAME ?= managed
+WATCH_NAMESPACE ?= $(MANAGED_CLUSTER_NAME)
 ifneq ($(KIND_VERSION), latest)
 	KIND_ARGS = --image kindest/node:$(KIND_VERSION)
 else
@@ -199,25 +201,14 @@ kind-bootstrap-cluster: kind-create-cluster install-crds kind-deploy-controller 
 .PHONY: kind-bootstrap-cluster-dev
 kind-bootstrap-cluster-dev: kind-create-cluster install-crds install-resources
 
-check-env:
-ifndef DOCKER_USER
-	$(error DOCKER_USER is undefined)
-endif
-ifndef DOCKER_PASS
-	$(error DOCKER_PASS is undefined)
-endif
-
-kind-deploy-controller: check-env generate-operator-yaml
-	@echo installing policy-template-sync
+kind-deploy-controller: generate-operator-yaml
+	@echo installing $(IMG)
 	kubectl create ns $(KIND_NAMESPACE)
 	kubectl apply -f deploy/operator.yaml -n $(KIND_NAMESPACE)
 
-kind-deploy-controller-dev: generate-operator-yaml
+kind-deploy-controller-dev: kind-deploy-controller
 	@echo Pushing image to KinD cluster
 	kind load docker-image $(REGISTRY)/$(IMG):$(TAG) --name $(KIND_NAME)
-	@echo Installing $(IMG)
-	kubectl create ns $(KIND_NAMESPACE)
-	kubectl apply -f deploy/operator.yaml -n $(KIND_NAMESPACE)
 	@echo "Patch deployment image"
 	kubectl patch deployment $(IMG) -n $(KIND_NAMESPACE) -p "{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"$(IMG)\",\"imagePullPolicy\":\"Never\"}]}}}}"
 	kubectl patch deployment $(IMG) -n $(KIND_NAMESPACE) -p "{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"$(IMG)\",\"image\":\"$(REGISTRY)/$(IMG):$(TAG)\"}]}}}}"
@@ -236,6 +227,8 @@ install-crds:
 
 install-resources:
 	@echo creating namespaces
+	kubectl create ns $(WATCH_NAMESPACE)
+
 e2e-dependencies:
 	go get github.com/onsi/ginkgo/v2/ginkgo@$(GINKGO_VERSION)
 	go get github.com/onsi/gomega/...@$(GOMEGA_VERSION)
