@@ -13,7 +13,6 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/stolostron/governance-policy-propagator/test/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -77,11 +76,6 @@ var _ = BeforeSuite(func() {
 			},
 		}, metav1.CreateOptions{})).NotTo(BeNil())
 	}
-	By("Create configpolicy CRD")
-	_, err := utils.KubectlWithOutput("apply", "-f",
-		"https://raw.githubusercontent.com/stolostron/config-policy-controller/"+
-			"main/deploy/crds/policy.open-cluster-management.io_configurationpolicies.yaml")
-	Expect(err).Should(BeNil())
 })
 
 func NewKubeClient(url, kubeconfig, context string) kubernetes.Interface {
