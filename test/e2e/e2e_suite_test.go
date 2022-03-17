@@ -27,13 +27,13 @@ import (
 )
 
 var (
-	testNamespace             string
-	clientManaged             kubernetes.Interface
-	clientManagedDynamic      dynamic.Interface
-	gvrPolicy                 schema.GroupVersionResource
-	gvrEvent                  schema.GroupVersionResource
-	gvrTrustedContainerPolicy schema.GroupVersionResource
-	defaultTimeoutSeconds     int
+	testNamespace          string
+	clientManaged          kubernetes.Interface
+	clientManagedDynamic   dynamic.Interface
+	gvrPolicy              schema.GroupVersionResource
+	gvrEvent               schema.GroupVersionResource
+	gvrConfigurationPolicy schema.GroupVersionResource
+	defaultTimeoutSeconds  int
 
 	defaultImageRegistry string
 )
@@ -56,10 +56,10 @@ var _ = BeforeSuite(func() {
 		Version:  "v1",
 		Resource: "policies",
 	}
-	gvrTrustedContainerPolicy = schema.GroupVersionResource{
-		Group:    "policies.ibm.com",
-		Version:  "v1alpha1",
-		Resource: "trustedcontainerpolicies",
+	gvrConfigurationPolicy = schema.GroupVersionResource{
+		Group:    "policy.open-cluster-management.io",
+		Version:  "v1",
+		Resource: "configurationpolicies",
 	}
 	gvrEvent = schema.GroupVersionResource{Group: "", Version: "v1", Resource: "events"}
 	clientManaged = NewKubeClient("", "", "")
@@ -77,8 +77,10 @@ var _ = BeforeSuite(func() {
 			},
 		}, metav1.CreateOptions{})).NotTo(BeNil())
 	}
-	By("Create trustedcontainerpolicy CRD")
-	_, err := utils.KubectlWithOutput("apply", "-f", "../resources/policies.ibm.com_trustedcontainerpolicies_crd.yaml")
+	By("Create configpolicy CRD")
+	_, err := utils.KubectlWithOutput("apply", "-f",
+		"https://raw.githubusercontent.com/stolostron/config-policy-controller/"+
+			"main/deploy/crds/policy.open-cluster-management.io_configurationpolicies.yaml")
 	Expect(err).Should(BeNil())
 })
 
