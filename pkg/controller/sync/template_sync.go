@@ -126,6 +126,10 @@ func (r *ReconcilePolicy) Reconcile(request reconcile.Request) (reconcile.Result
 		return reconcile.Result{}, nil
 	}
 
+	// In certain situations, we should requeue without an error, *after* other logic.
+	// Use this in non-error returns to correctly handle those situations.
+	result := reconcile.Result{}
+
 	// PolicyTemplates is not empty
 	// loop through policy templates
 	for _, policyT := range instance.Spec.PolicyTemplates {
@@ -149,6 +153,10 @@ func (r *ReconcilePolicy) Reconcile(request reconcile.Request) (reconcile.Result
 			mappingErrMsg := fmt.Sprintf("NonCompliant; %s, please check if you have CRD deployed.", err)
 			r.recorder.Event(instance, "Warning",
 				fmt.Sprintf(policyFmtStr, instance.GetNamespace(), object.(metav1.Object).GetName()), mappingErrMsg)
+
+			// Requeue so that when the CRD is installed, the object will automatically be created.
+			result.Requeue = true
+
 			continue
 		}
 
@@ -271,7 +279,7 @@ func (r *ReconcilePolicy) Reconcile(request reconcile.Request) (reconcile.Result
 		}
 	}
 	reqLogger.Info("Reconciliation complete.")
-	return reconcile.Result{}, nil
+	return result, nil
 }
 
 func overrideRemediationAction(instance *policiesv1.Policy, tObjectUnstructured *unstructured.Unstructured) {
