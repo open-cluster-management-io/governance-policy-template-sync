@@ -64,18 +64,17 @@ var _ = Describe("Test error handling", func() {
 			"-n", testNamespace)
 		Expect(err).Should(BeNil())
 		By("Creating event with decode err on managed cluster in ns:" + testNamespace)
-		eventList := utils.ListWithTimeout(clientManagedDynamic, gvrEvent, metav1.ListOptions{FieldSelector: "involvedObject.name=default.case2-template-mapping-error"}, 2, true, defaultTimeoutSeconds)
-		By("Deleting the event to clean up")
-		for _, event := range eventList.Items {
-			_, err = utils.KubectlWithOutput("delete", "event", event.GetName(), "-n", testNamespace)
-			Expect(err).Should(BeNil())
-		}
-		eventList = utils.ListWithTimeout(clientManagedDynamic, gvrEvent, metav1.ListOptions{FieldSelector: "involvedObject.name=default.case2-template-mapping-error"}, 0, true, defaultTimeoutSeconds)
+		utils.ListWithTimeout(clientManagedDynamic, gvrEvent, metav1.ListOptions{FieldSelector: "involvedObject.name=default.case2-template-mapping-error"}, 2, true, defaultTimeoutSeconds)
 		By("Deleting ../resources/case2_error_test/template-mapping-error.yaml to clean up")
 		_, err = utils.KubectlWithOutput("delete", "-f", "../resources/case2_error_test/template-mapping-error.yaml",
 			"-n", testNamespace)
 		Expect(err).Should(BeNil())
 		utils.ListWithTimeout(clientManagedDynamic, gvrPolicy, metav1.ListOptions{}, 0, true, defaultTimeoutSeconds)
+		By("Deleting the events to clean up")
+		_, err = utils.KubectlWithOutput("delete", "event", "-n", testNamespace, "--field-selector",
+			"involvedObject.name=default.case2-template-mapping-error")
+		Expect(err).Should(BeNil())
+		utils.ListWithTimeout(clientManagedDynamic, gvrEvent, metav1.ListOptions{FieldSelector: "involvedObject.name=default.case2-template-mapping-error"}, 0, true, defaultTimeoutSeconds)
 	})
 	It("should generate duplicate policy template err event", func() {
 		By("Creating ../resources/case2_error_test/working-policy-duplicate.yaml on managed cluster in ns:" + testNamespace)
